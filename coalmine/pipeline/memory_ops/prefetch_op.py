@@ -11,6 +11,9 @@ class PrefetchOp(Pipeline):
         self.pipeline = pipeline
         self.buffer_size = buffer_size
 
+    def __len__(self):
+        return len(self.pipeline)
+
     def __iter__(self):
         queue = Queue(self.buffer_size)
         stop_event = Event()

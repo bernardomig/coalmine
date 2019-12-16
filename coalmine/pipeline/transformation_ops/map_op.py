@@ -28,13 +28,7 @@ class MapOp(Pipeline):
         if self.num_parallel_calls:
             return parallel_map(self.map_fn, self.pipeline, num_threads=self.num_parallel_calls, inorder=self.in_order)
         else:
-            for item in self.pipeline:
-                if type(item) == dict:
-                    item = self.map_fn(**item)
-                elif type(item) == tuple:
-                    item = self.map_fn(*item)
-                else:
-                    item = self.map_fn(item)
+            return map(self.map_fn, self.pipeline)
 
 
 class AtomicCounter:
@@ -71,13 +65,7 @@ def parallel_map(map_fn, iterable, num_threads, inorder=False):
         while not stop_workers.is_set():
             try:
                 idx, item = in_queue.get(timeout=0.01)
-
-                if type(item) == dict:
-                    item = map_fn(**item)
-                elif type(item) == tuple:
-                    item = map_fn(*item)
-                else:
-                    item = map_fn(item)
+                item = map_fn(item)
 
                 if inorder:
                     while ticket.current != idx:

@@ -10,5 +10,8 @@ class ZipOp(Pipeline):
 
         self.pipelines = pipelines
 
+    def __len__(self):
+        return len(self.pipelines[0])
+
     def __iter__(self):
         return zip(*self.pipelines)

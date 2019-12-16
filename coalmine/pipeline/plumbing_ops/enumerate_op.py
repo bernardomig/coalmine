@@ -7,5 +7,8 @@ class EnumerateOp(Pipeline):
     def __init__(self, pipeline):
         self.pipeline = pipeline
 
+    def __len__(self):
+        return len(self.pipeline)
+
     def __iter__(self):
         return enumerate(self.pipeline)

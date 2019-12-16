@@ -7,10 +7,10 @@ import numpy as np
 @register_pipeline_op('batch', type='method')
 class BatchOp(Pipeline):
 
-    def __init__(self, pipeline, batch_size, drop_remainder=True):
+    def __init__(self, pipeline, batch_size, drop_last=True):
         self.pipeline = pipeline
         self.batch_size = batch_size
-        self.drop_remainder = drop_remainder
+        self.drop_last = drop_last
 
     def __len__(self):
         if self.batch_size:
@@ -58,7 +58,7 @@ class BatchOp(Pipeline):
                 batch = None
                 batch_size = 0
 
-        if not self.drop_remainder and batch_size > 0:
+        if not self.drop_last and batch_size > 0:
             if type(batch) == list:
                 yield np.array(batch)
             elif type(batch) == tuple:
