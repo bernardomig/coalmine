@@ -1,14 +1,14 @@
-from coalmine import Dataset, register_operation
+from coalmine.pipeline import Pipeline, register_pipeline_op
 
 from threading import Thread, Event
 from queue import Queue
 
 
-@register_operation('prefetch')
-class PrefetchOp(Dataset):
+@register_pipeline_op('prefetch')
+class PrefetchOp(Pipeline):
 
-    def __init__(self, dataset, buffer_size):
-        self.dataset = dataset
+    def __init__(self, pipeline, buffer_size):
+        self.pipeline = pipeline
         self.buffer_size = buffer_size
 
     def __iter__(self):
@@ -16,7 +16,7 @@ class PrefetchOp(Dataset):
         stop_event = Event()
 
         def producer():
-            for item in self.dataset:
+            for item in self.pipeline:
                 queue.put(item)
 
             stop_event.set()
