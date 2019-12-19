@@ -4,7 +4,7 @@ from coalmine.pipeline import register_pipeline_op
 import numpy as np
 import cv2
 
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 
 @register_pipeline_op('to_video')

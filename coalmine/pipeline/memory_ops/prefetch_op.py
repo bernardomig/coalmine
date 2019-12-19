@@ -20,12 +20,20 @@ class PrefetchOp(Pipeline):
 
         def producer():
             for item in self.pipeline:
+                if stop_event.is_set():
+                    break
                 queue.put(item)
 
             stop_event.set()
 
-        producer_thread = Thread(target=producer)
-        producer_thread.start()
+        try:
+            producer_thread = Thread(target=producer)
+            producer_thread.start()
 
-        while not (stop_event.is_set() and queue.empty()):
-            yield queue.get()
+            while not (stop_event.is_set() and queue.empty()):
+                yield queue.get()
+
+        except:
+            pass
+        finally:
+            stop_event.set()

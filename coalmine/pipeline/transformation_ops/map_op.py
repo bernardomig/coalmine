@@ -78,17 +78,22 @@ def parallel_map(map_fn, iterable, num_threads, inorder=False):
 
     def publisher():
         for idx, item in enumerate(iterable):
+            if stop_event.is_set():
+                break
             counter.increment()
             in_queue.put((idx, item))
         stop_event.set()
 
-    Thread(target=publisher).start()
-    for _ in range(num_threads):
-        Thread(target=worker).start()
+    try:
+        Thread(target=publisher).start()
+        for _ in range(num_threads):
+            Thread(target=worker).start()
 
-    while (not stop_event.is_set()) or counter.current > 0:
-        item = out_queue.get()
-        yield item
-        counter.decrement()
-
-    stop_workers.set()
+        while (not stop_event.is_set()) or counter.current > 0:
+            item = out_queue.get()
+            yield item
+            counter.decrement()
+    except:
+        pass
+    finally:
+        stop_workers.set()
