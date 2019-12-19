@@ -8,12 +8,12 @@ from tqdm.auto import tqdm
 
 
 @register_pipeline_op('to_video')
-def to_video_op(pipeline, filename, frame_size, framerate, with_info=True):
+def to_video_op(pipeline, filename, frame_size, framerate, encoding='MJPG', with_info=True):
 
     width, height = frame_size
 
     video = cv2.VideoWriter(filename,
-                            cv2.VideoWriter_fourcc(*'MJPG'),
+                            cv2.VideoWriter_fourcc(*encoding),
                             framerate,
                             frame_size)
 
