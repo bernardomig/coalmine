@@ -1,9 +1,11 @@
 
 
-class SequentialFeature:
+class FeatureCompose:
 
-    def __init__(self, feature):
-        self.feature = feature
+    def __init__(self, features):
+        self.features = features
 
     def __call__(self, input):
-        return [self.feature(x) for x in input]
+        for feature in self.features:
+            input = feature(input)
+        return input
