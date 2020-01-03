@@ -1,13 +1,10 @@
-
-from coalmine.feature import Feature
-
 from pathlib import Path
 
 import numpy as np
 import cv2
 
 
-class ImageFeature(Feature):
+class ImageFeature:
 
     def __init__(self, imsize=None, grayscale=False):
 
