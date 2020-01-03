@@ -1,6 +1,6 @@
 
 
-class FeatureCompose:
+class FeatureSequence:
 
     def __init__(self, features):
         self.features = features
