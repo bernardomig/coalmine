@@ -1,11 +1,11 @@
 
-from coalmine.pipeline import Pipeline, register_pipeline_op
+from coalmine.dataset import Dataset, register_op
 
 import numpy as np
 
 
-@register_pipeline_op('from_tensors', type='staticmethod')
-class FromTensorsOp(Pipeline):
+@register_op('from_tensors', type='staticmethod')
+class FromTensorsOp(Dataset):
 
     def __init__(self, tensors):
         if type(tensors) == list:
@@ -35,6 +35,14 @@ class FromTensorsOp(Pipeline):
 
     def __len__(self):
         return self.size
+
+    def __getitem__(self, idx):
+        if type(self.tensors) == np.array:
+            return self.tensors[idx]
+        elif type(self.tensors) == tuple:
+            return tuple((t[i] for t in self.tensors))
+        elif type(self.tensors) == dict:
+            return {k: t[i] for k, t in self.tensors.items()}
 
     def __iter__(self):
         if type(self.tensors) == np.ndarray:

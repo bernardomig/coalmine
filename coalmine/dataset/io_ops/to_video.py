@@ -1,5 +1,5 @@
 
-from coalmine.pipeline import register_pipeline_op
+from coalmine.dataset import Dataset, register_op
 
 import numpy as np
 import cv2
@@ -7,8 +7,8 @@ import cv2
 from tqdm.auto import tqdm
 
 
-@register_pipeline_op('to_video')
-def to_video_op(pipeline, filename, frame_size, framerate, encoding='MJPG', with_info=True):
+@register_op('to_video')
+def to_video_op(dataset, filename, frame_size, framerate, encoding='MJPG', with_info=True):
 
     width, height = frame_size
 
@@ -20,7 +20,7 @@ def to_video_op(pipeline, filename, frame_size, framerate, encoding='MJPG', with
     if video.isOpened() == False:
         raise ValueError("Error opening video for writing")
 
-    for frame in tqdm(pipeline):
+    for frame in tqdm(dataset):
         assert type(frame) == np.ndarray
         assert frame.shape[:2] == (height, width)
         video.write(frame)

@@ -1,9 +1,9 @@
 
-from coalmine.pipeline import Pipeline, register_pipeline_op
+from coalmine.dataset import Dataset, register_op
 
 
-@register_pipeline_op('range', type='staticmethod')
-class RangeOp(Pipeline):
+@register_op('range', type='staticmethod')
+class RangeOp(Dataset):
 
     def __init__(self, *args, **kwargs):
         if len(kwargs) == 0:
@@ -42,6 +42,9 @@ class RangeOp(Pipeline):
 
     def __len__(self):
         return abs((self.end - self.begin) // self.step)
+
+    def __getitem__(self, idx):
+        return self.begin + idx * self.step
 
     def __iter__(self):
         for item in range(self.begin, self.end, self.step):

@@ -1,12 +1,12 @@
 
-from coalmine.pipeline import Pipeline, register_pipeline_op
+from coalmine.dataset import Dataset, register_op
 
 import os
 import glob
 
 
-@register_pipeline_op('list_files', type='staticmethod')
-class ListFilesOp(Pipeline):
+@register_op('list_files', type='staticmethod')
+class ListFilesOp(Dataset):
 
     def __init__(self, directory=None, glob=None, extension=None, cache=True, sorted=True):
         if (directory and glob):
@@ -32,9 +32,18 @@ class ListFilesOp(Pipeline):
             return len(self.files)
         else:
             raise TypeError(
-                "file list is not caches, therefore the length is unknown."
+                "file list is not cached, therefore the length is unknown."
                 "to cache the file list, either pass the parameter cache=True"
-                "  or call .cache(), on the pipeline.")
+                "  or call .cache(), on the dataset.")
+
+    def __getitem__(self, idx):
+        if self.files:
+            return self.files[idx]
+        else:
+            raise TypeError(
+                "file list is not cached, therefore the length is unknown."
+                "to cache the file list, either pass the parameter cache=True"
+                "  or call .cache(), on the dataset.")
 
     def _find_files(self):
         if self.directory is not None:

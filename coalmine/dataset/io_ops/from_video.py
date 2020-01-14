@@ -1,10 +1,10 @@
-from coalmine.pipeline import Pipeline, register_pipeline_op
+from coalmine.dataset import Dataset, register_op
 
 import cv2
 
 
-@register_pipeline_op('from_video')
-class FromVideoOp(Pipeline):
+@register_op('from_video')
+class FromVideoOp(Dataset):
 
     def __init__(self, filename):
         self.filename = filename

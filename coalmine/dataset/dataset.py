@@ -1,9 +1,9 @@
 
-class Pipeline:
+class Dataset:
     pass
 
 
-def register_pipeline_op(name, type='method'):
+def register_op(name, type='method'):
     def wrapper(Class):
         if type == 'method':
             def _operation(self, *args, **kwargs):
@@ -16,7 +16,7 @@ def register_pipeline_op(name, type='method'):
             raise ValueError("type should be either 'method' or 'staticmethod', not {}"
                              .format(type))
 
-        setattr(Pipeline, name, _operation)
+        setattr(Dataset, name, _operation)
         return Class
 
     return wrapper

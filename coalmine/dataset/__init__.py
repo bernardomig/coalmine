@@ -1,5 +1,5 @@
 
-from .pipeline import Pipeline, register_pipeline_op
+from .dataset import Dataset, register_op
 
 from .builder_ops import *
 from .consumer_ops import *

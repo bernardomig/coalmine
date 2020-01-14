@@ -1,5 +1,5 @@
 
-from coalmine.pipeline import Pipeline, register_pipeline_op
+from coalmine.dataset import Dataset, register_op
 
 from threading import Thread, Event, Lock
 from queue import Queue, Empty
@@ -7,11 +7,11 @@ from queue import Queue, Empty
 from time import sleep
 
 
-@register_pipeline_op('map')
-class MapOp(Pipeline):
+@register_op('map')
+class MapOp(Dataset):
 
-    def __init__(self, pipeline, map_fn, num_parallel_calls=None, in_order=False):
-        self.pipeline = pipeline
+    def __init__(self, dataset, map_fn, num_parallel_calls=None, in_order=False):
+        self.dataset = dataset
         self.map_fn = map_fn
 
         if num_parallel_calls is not None and num_parallel_calls <= 0:
@@ -22,13 +22,23 @@ class MapOp(Pipeline):
         self.in_order = in_order
 
     def __len__(self):
-        return len(self.pipeline)
+        return len(self.dataset)
+
+    def __getitem__(self, idx):
+        return self.map_fn(self.dataset[idx])
 
     def __iter__(self):
         if self.num_parallel_calls:
-            return parallel_map(self.map_fn, self.pipeline, num_threads=self.num_parallel_calls, inorder=self.in_order)
+            return parallel_map(self.map_fn, self.dataset, num_threads=self.num_parallel_calls, inorder=self.in_order)
         else:
-            return map(self.map_fn, self.pipeline)
+            return map(self.map_fn, self.dataset)
+
+
+@register_op('starmap')
+def StarMapOp(dataset, map_fn, *args, **kwargs):
+    def starmap_fn(item):
+        return map_fn(**item)
+    return MapOp(dataset, starmap_fn, *args, **kwargs)
 
 
 class AtomicCounter:

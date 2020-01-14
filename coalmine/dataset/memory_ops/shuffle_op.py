@@ -1,22 +1,25 @@
 
-from coalmine.pipeline import Pipeline, register_pipeline_op
+from coalmine.dataset import Dataset, register_op
 
 from random import randrange
 
 
-@register_pipeline_op('shuffle')
-class ShuffleOp(Pipeline):
-    def __init__(self, pipeline, shuffle_size):
-        self.pipeline = pipeline
+@register_op('shuffle')
+class ShuffleOp(Dataset):
+    def __init__(self, dataset, shuffle_size):
+        self.dataset = dataset
         self.shuffle_size = shuffle_size
 
     def __len__(self):
-        return len(self.pipeline)
+        return len(self.dataset)
+
+    def __getitem__(self, idx):
+        return self.dataset[idx]
 
     def __iter__(self):
         buffer = []
 
-        for item in self.pipeline:
+        for item in self.dataset:
             if len(buffer) < self.shuffle_size:
                 # fill the buffer
                 buffer.append(item)
