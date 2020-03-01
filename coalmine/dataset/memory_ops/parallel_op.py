@@ -39,8 +39,8 @@ class ParallelOp(Dataset):
         def worker():
             while not stop_workers.is_set():
                 try:
-                    idx, item = in_queue.get(timeout=0.01)
-                    item = self.dataset[item]
+                    idx = in_queue.get(timeout=0.01)
+                    item = self.dataset[idx]
 
                     if self.inorder:
                         while ticket.current != idx:
@@ -52,16 +52,16 @@ class ParallelOp(Dataset):
                     pass
 
         def publisher():
-            for idx, item in range(len(self.dataset)):
+            for idx in range(len(self.dataset)):
                 if stop_event.is_set():
                     break
                 counter.increment()
-                in_queue.put((idx, item))
+                in_queue.put(idx)
             stop_event.set()
 
         try:
             Thread(target=publisher).start()
-            for _ in range(num_threads):
+            for _ in range(self.num_parallel_calls):
                 Thread(target=worker).start()
 
             while (not stop_event.is_set()) or counter.current > 0:

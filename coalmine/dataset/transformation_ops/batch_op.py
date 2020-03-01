@@ -5,8 +5,6 @@ import numpy as np
 
 import torch
 
-# TODO: add tensor awareness
-
 
 @register_op('batch', type='method')
 class BatchOp(Dataset):
@@ -26,6 +24,42 @@ class BatchOp(Dataset):
             raise TypeError(
                 "please specify the batch_size in the unbatch"
                 "operation in order to calculate the length of the dataset.")
+
+    def __getitem__(self, idx):
+        start_idx = idx * len(self.dataset) // self.batch_size
+        end_idx = start_idx + self.batch_size
+        batch = None
+        for i in range(start_idx, end_idx):
+            item = self.dataset[i]
+            if batch == None:
+                if type(item) == np.ndarray:
+                    batch = []
+                elif type(item) == tuple:
+                    batch = tuple(([] for i in range(len(item))))
+                elif type(item) == dict:
+                    batch = {k: [] for k in item.keys()}
+                else:
+                    raise ValueError('incompatible item type')
+
+        if type(item) == np.ndarray:
+            batch.append(item)
+        elif type(item) == tuple:
+            for i, t in enumerate(item):
+                batch[i].append(t)
+        elif type(item) == dict:
+            for k, t in item.items():
+                batch[k].append(t)
+
+        collate_fn = self.collate_fn
+        if collate_fn is None:
+            collate_fn = default_collate_fn
+
+        if type(batch) == list:
+            return collate_fn(batch)
+        elif type(batch) == tuple:
+            return tuple(map(collate_fn, batch))
+        elif type(batch) == dict:
+            return {k: collate_fn(t) for k, t in batch.items()}
 
     def __iter__(self):
         batch = None
@@ -77,9 +111,9 @@ class BatchOp(Dataset):
 
 
 def default_collate_fn(item):
-    if type(item) == np.ndarray:
+    if type(item[0]) == np.ndarray:
         return np.stack(item)
-    elif type(item) == torch.Tensor:
+    elif type(item[0]) == torch.Tensor:
         return torch.stack(item)
     else:
         raise ValueError(
