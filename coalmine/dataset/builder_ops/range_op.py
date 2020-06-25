@@ -4,6 +4,13 @@ from coalmine.dataset import Dataset, register_op
 
 @register_op('range', type='staticmethod')
 class RangeOp(Dataset):
+    """Constructs a new dataset with similar properties as with the `range` operator.
+
+    Args:
+        start (int): the first element. Default: 0.
+        end (int): the last element.
+        step (int): the step size. Default: 1.
+    """
 
     def __init__(self, *args, **kwargs):
         if len(kwargs) == 0:
